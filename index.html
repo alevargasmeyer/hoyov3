@@ -3,470 +3,251 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HOYO 19 — Informe Interactivo</title>
+<title>HOYO19 — Mining Reporte 2026</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>⛏️</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.7/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0b0f1a;--surface:#111623;--surface2:#161c2c;--surface3:#1c2336;
-  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
-  --text:#e4e8f1;--text2:#8b93a7;--text3:#5a6278;
-  --gold:#e8b830;--gold2:#f5cc40;--gold-dim:rgba(232,184,48,.08);
-  --green:#4ade80;--green-dim:rgba(74,222,128,.08);
-  --red:#f87171;--red-dim:rgba(248,113,113,.08);
-  --blue:#60a5fa;--orange:#fb923c;
-  --sidebar-w:300px;--topbar-h:56px;
+  --bg:#0b0f1a;
+  --surface:rgba(255,255,255,.04);
+  --surface2:rgba(255,255,255,.07);
+  --glass:rgba(255,255,255,.05);
+  --glass-border:rgba(255,255,255,.08);
+  --text:#e4e8f1;
+  --text2:#8b93a7;
+  --text3:#5a6278;
+  --gold:#e8b830;
+  --gold2:#f5cc40;
+  --gold-dim:rgba(232,184,48,.08);
+  --gold-glow:rgba(232,184,48,.15);
 }
-html{scroll-behavior:smooth;font-size:15px}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-a{color:var(--gold);text-decoration:none}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
 
-/* ── TOPBAR ── */
-.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);background:rgba(11,15,26,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;z-index:100;gap:12px}
-.topbar .logo{font-weight:800;font-size:.95rem;color:var(--gold);letter-spacing:2px}
-.topbar .sep{color:var(--text3);font-size:.7rem}
-.topbar .page-title{color:var(--text2);font-size:.82rem;font-weight:500}
-.topbar .back{color:var(--text3);font-size:.78rem;display:flex;align-items:center;gap:4px;transition:color .2s}
-.topbar .back:hover{color:var(--text)}
-.topbar .spacer{flex:1}
-.toggle{display:flex;background:var(--surface2);border-radius:8px;overflow:hidden;border:1px solid var(--border)}
-.toggle button{padding:8px 20px;font-family:inherit;font-size:.8rem;font-weight:600;border:none;cursor:pointer;transition:all .25s;color:var(--text3);background:transparent}
-.toggle button.on{background:var(--gold);color:var(--bg)}
-.toggle button:hover:not(.on){color:var(--text)}
+/* ═══ NAVBAR ═══ */
+.navbar{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 48px;z-index:100;background:rgba(11,15,26,.7);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.05)}
+.nav-logo{font-size:1.1rem;font-weight:800;letter-spacing:3px;color:var(--gold)}
+.nav-links{display:flex;gap:36px;margin-left:56px}
+.nav-links a{font-size:.85rem;font-weight:500;color:var(--text2);transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-spacer{flex:1}
+.nav-btn{padding:9px 22px;background:rgba(232,184,48,.12);border:1px solid rgba(232,184,48,.25);border-radius:8px;color:var(--gold);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .25s;font-family:inherit}
+.nav-btn:hover{background:var(--gold);color:var(--bg)}
+.mobile-nav-btn{display:none;background:none;border:1px solid var(--glass-border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:1rem;cursor:pointer}
 
-/* ── SIDEBAR ── */
-.sidebar{position:fixed;top:var(--topbar-h);left:0;width:var(--sidebar-w);height:calc(100vh - var(--topbar-h));background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;z-index:90;transition:transform .3s}
-.sidebar::-webkit-scrollbar{width:3px}
-.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
-.sidebar-inner{padding:16px 0 40px}
-.ns{margin-bottom:2px}
-.ns-title{display:flex;align-items:center;padding:10px 18px;font-size:.76rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;gap:8px;user-select:none}
-.ns-title:hover{color:var(--text);background:var(--surface2)}
-.ns-title .n{color:var(--gold);font-size:.7rem;font-weight:700;min-width:20px}
-.ns-title .arr{margin-left:auto;font-size:.6rem;transition:transform .2s;color:var(--text3)}
-.ns-title.open .arr{transform:rotate(90deg)}
-.ni-list{display:none;padding:0 0 6px}
-.ni-list.open{display:block}
-.ni{display:block;padding:5px 18px 5px 46px;font-size:.73rem;color:var(--text3);cursor:pointer;transition:all .12s;line-height:1.5}
-.ni:hover{color:var(--text);background:rgba(232,184,48,.04)}
-.ni.active{color:var(--gold);background:var(--gold-dim);border-right:2px solid var(--gold)}
+/* ═══ HERO ═══ */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:
+  radial-gradient(ellipse 80% 60% at 50% 40%,rgba(232,184,48,.06) 0%,transparent 60%),
+  radial-gradient(ellipse 60% 50% at 70% 60%,rgba(30,60,120,.12) 0%,transparent 50%),
+  linear-gradient(180deg,var(--bg) 0%,#0d1220 50%,var(--bg) 100%);z-index:0}
+.hero-particles{position:absolute;inset:0;z-index:1;opacity:.4}
+.hero-content{position:relative;z-index:2;text-align:center;max-width:780px;padding:0 24px}
+.hero-tag{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:24px;padding:8px 20px;border:1px solid var(--glass-border);border-radius:24px;background:var(--glass)}
+.hero h1{font-size:clamp(2.4rem,5.5vw,4rem);font-weight:800;line-height:1.1;margin-bottom:24px;letter-spacing:-.5px}
+.hero h1 .gold{color:var(--gold)}
+.hero-sub{color:var(--text2);font-size:clamp(.95rem,1.4vw,1.1rem);max-width:560px;margin:0 auto 40px;line-height:1.8}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;font-family:inherit;font-size:.9rem;font-weight:600;border-radius:10px;cursor:pointer;transition:all .3s;border:none}
+.btn-gold{background:var(--gold);color:var(--bg)}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(232,184,48,.25)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--glass-border)}
+.btn-outline:hover{border-color:rgba(255,255,255,.2);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--text2);padding:14px 20px}
+.btn-ghost:hover{color:var(--gold)}
 
-/* ── MAIN ── */
-.main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);min-height:calc(100vh - var(--topbar-h))}
-.content{max-width:920px;margin:0 auto;padding:40px 40px 120px}
+/* ═══ MARQUEE ═══ */
+.marquee-section{border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);padding:28px 0;overflow:hidden;background:rgba(255,255,255,.015)}
+.marquee-track{display:flex;gap:40px;animation:marq 25s linear infinite;width:max-content}
+.marquee-track span{font-size:1.6rem;opacity:.25;user-select:none}
+@keyframes marq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
-/* ── KPI CARDS ── */
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:40px}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;transition:all .3s}
-.kpi:hover{border-color:rgba(232,184,48,.2);transform:translateY(-2px)}
-.kpi-label{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600}
-.kpi-val{font-size:1.5rem;font-weight:800;transition:all .4s}
-.kpi-val.g{color:var(--green)}.kpi-val.w{color:var(--orange)}.kpi-val.d{color:var(--text)}
-.kpi-sub{font-size:.68rem;color:var(--text3);margin-top:4px}
+/* ═══ SERVICES ═══ */
+.services{padding:100px 48px;max-width:1140px;margin:0 auto}
+.section-label{font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.services h2{font-size:clamp(1.6rem,3vw,2.3rem);font-weight:700;margin-bottom:8px}
+.services .sub{color:var(--text2);font-size:.95rem;margin-bottom:56px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:24px}
 
-/* ── PILLS ── */
-.pills{display:flex;gap:10px;margin-bottom:40px;flex-wrap:wrap}
-.pill{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:.75rem;font-weight:500;border:1px solid}
-.pill.r{background:rgba(96,165,250,.06);border-color:rgba(96,165,250,.15);color:var(--blue)}
-.pill.b{background:var(--red-dim);border-color:rgba(248,113,113,.15);color:var(--red)}
-.pill.s{background:var(--gold-dim);border-color:rgba(232,184,48,.15);color:var(--gold)}
+/* GLASS CARD — matches your screenshot */
+.card{position:relative;background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:16px;padding:36px 30px;transition:all .4s;overflow:hidden;cursor:default;display:flex;flex-direction:column}
+.card::before{content:'';position:absolute;inset:0;border-radius:16px;background:radial-gradient(ellipse at 30% 90%,rgba(232,184,48,.06) 0%,transparent 50%);opacity:0;transition:opacity .4s}
+.card:hover{border-color:rgba(232,184,48,.2);transform:translateY(-4px)}
+.card:hover::before{opacity:1}
+.card.clickable{cursor:pointer}
+.card.clickable:hover{border-color:rgba(232,184,48,.35);box-shadow:0 8px 40px rgba(232,184,48,.08)}
+.card-icon{font-size:2rem;margin-bottom:20px;position:relative;z-index:1}
+.card h3{font-size:1.15rem;font-weight:700;color:var(--gold);margin-bottom:12px;line-height:1.4;position:relative;z-index:1}
+.card p{color:var(--text2);font-size:.88rem;line-height:1.75;flex:1;position:relative;z-index:1}
+.card-tag{display:inline-block;margin-top:18px;font-size:.72rem;font-weight:600;color:var(--gold);border:1px solid rgba(232,184,48,.2);padding:5px 12px;border-radius:6px;position:relative;z-index:1;transition:all .25s}
+.card.clickable:hover .card-tag{background:var(--gold);color:var(--bg)}
+.card-link{position:absolute;inset:0;z-index:2}
 
-/* ── SECTIONS ── */
-.sec{margin-bottom:56px;scroll-margin-top:calc(var(--topbar-h) + 20px)}
-.sec-badge{display:inline-block;font-size:.65rem;font-weight:700;color:var(--gold);background:var(--gold-dim);padding:3px 10px;border-radius:5px;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase}
-.sec h2{font-size:1.4rem;font-weight:700;margin-bottom:8px}
-.sec .intro{color:var(--text2);font-size:.86rem;margin-bottom:24px;max-width:660px}
-.sub{margin-bottom:24px;padding:22px;background:var(--surface);border:1px solid var(--border);border-radius:12px;transition:border-color .2s}
-.sub:hover{border-color:var(--border2)}
-.sub h3{font-size:.95rem;font-weight:600;margin-bottom:8px}
-.sub h4{font-size:.84rem;font-weight:600;color:var(--gold);margin-bottom:6px;margin-top:14px}
-.sub p{color:var(--text2);font-size:.82rem;line-height:1.75;margin-bottom:8px}
-.sub ul{padding-left:18px;margin-bottom:8px}
-.sub li{color:var(--text2);font-size:.82rem;line-height:1.7;margin-bottom:3px}
-.sub li::marker{color:var(--gold)}
+/* ═══ STATS ═══ */
+.stats{padding:80px 48px;border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);background:rgba(255,255,255,.015)}
+.stats-grid{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+.stat-val{font-size:clamp(2rem,3.5vw,2.8rem);font-weight:800;color:var(--gold);margin-bottom:6px}
+.stat-label{font-size:.82rem;color:var(--text3);font-weight:500}
 
-/* ── CHARTS ── */
-.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin:20px 0}
-.chart-box .chart-title{font-size:.8rem;font-weight:600;color:var(--text2);margin-bottom:14px}
-.chart-box canvas{max-height:300px}
+/* ═══ ABOUT ═══ */
+.about{padding:100px 48px;max-width:800px;margin:0 auto}
+.about h2{font-size:clamp(1.3rem,2.5vw,1.8rem);font-weight:700;margin-bottom:20px}
+.about p{color:var(--text2);font-size:.92rem;line-height:1.85;margin-bottom:16px}
 
-/* ── FLOW ── */
-.flow{display:flex;align-items:center;gap:0;margin:18px 0;flex-wrap:wrap;justify-content:center}
-.flow-n{padding:10px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:.76rem;font-weight:500;text-align:center;min-width:100px}
-.flow-n.hl{border-color:var(--gold);background:var(--gold-dim);color:var(--gold)}
-.flow-a{color:var(--text3);font-size:.9rem;padding:0 4px}
+/* ═══ CONTACT ═══ */
+.contact{padding:100px 48px;max-width:700px;margin:0 auto;text-align:center}
+.contact h2{font-size:clamp(1.3rem,2.5vw,1.8rem);font-weight:700;margin-bottom:12px}
+.contact p{color:var(--text2);font-size:.92rem;margin-bottom:36px}
+.contact-link{display:inline-block;font-size:1.05rem;font-weight:600;color:var(--gold);padding:18px 36px;border:1px solid rgba(232,184,48,.25);border-radius:12px;background:var(--gold-dim);transition:all .3s}
+.contact-link:hover{background:var(--gold);color:var(--bg);transform:translateY(-2px)}
 
-/* ── COMPARE TABLE ── */
-.ctable{width:100%;border-collapse:collapse;margin:14px 0}
-.ctable th{text-align:left;padding:9px 12px;font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);font-weight:600}
-.ctable td{padding:9px 12px;font-size:.8rem;color:var(--text2);border-bottom:1px solid var(--border)}
-.ctable td:first-child{font-weight:500;color:var(--text)}
-.vb{color:var(--red)}.vg{color:var(--green)}
+/* ═══ FOOTER ═══ */
+.footer{padding:48px;text-align:center;border-top:1px solid rgba(255,255,255,.04);color:var(--text3);font-size:.8rem}
+.footer-logo{font-weight:800;letter-spacing:3px;color:var(--gold);font-size:.95rem;margin-bottom:8px}
 
-/* ── RISK GRID ── */
-.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.rcard{padding:14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2)}
-.rcard .rt{font-size:.68rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px}
-.rcard .rt.o{color:var(--orange)}.rcard .rt.e{color:var(--red)}.rcard .rt.l{color:var(--blue)}.rcard .rt.x{color:var(--gold)}
-.rcard .rv{font-size:1rem;font-weight:800;margin-bottom:3px}
-.rcard .rd{font-size:.72rem;color:var(--text3);line-height:1.5}
-
-/* ── REC GRID ── */
-.recgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
-.rec{padding:14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);transition:all .2s}
-.rec:hover{border-color:rgba(232,184,48,.2);transform:translateY(-1px)}
-.rec .rn{font-size:.68rem;color:var(--gold);font-weight:700}
-.rec .rtt{font-size:.8rem;font-weight:600;margin:3px 0}
-.rec .rdd{font-size:.72rem;color:var(--text3);line-height:1.5}
-
-/* ── FOOTER ── */
-.foot{padding:36px;text-align:center;border-top:1px solid var(--border);color:var(--text3);font-size:.76rem}
-
-/* ── MOBILE ── */
-.mob-btn{display:none;position:fixed;top:12px;right:14px;z-index:110;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:1rem;cursor:pointer}
-@media(max-width:900px){
-  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
-  .main{margin-left:0}.content{padding:28px 18px 120px}
-  .kpis{grid-template-columns:1fr 1fr}.mob-btn{display:block}
-  .recgrid,.rgrid{grid-template-columns:1fr}
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:768px){
+  .navbar{padding:0 20px}
+  .nav-links{display:none}
+  .mobile-nav-btn{display:block}
+  .services,.about,.contact{padding:60px 20px}
+  .stats{padding:60px 20px}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:32px}
+  .hero-btns{flex-direction:column;align-items:center}
 }
-@media(max-width:500px){.kpis{grid-template-columns:1fr}.pills{flex-direction:column}}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.hero-content>*{opacity:0;animation:fadeUp .7s ease forwards}
+.hero-tag{animation-delay:.1s}
+.hero h1{animation-delay:.2s}
+.hero-sub{animation-delay:.35s}
+.hero-btns{animation-delay:.5s}
+.card{opacity:0;animation:fadeUp .6s ease forwards}
+.card:nth-child(1){animation-delay:.6s}
+.card:nth-child(2){animation-delay:.75s}
+.card:nth-child(3){animation-delay:.9s}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <a href="../index.html" class="logo">HOYO19</a>
-  <span class="sep">|</span>
-  <span class="page-title">Informe interactivo</span>
-  <a href="../index.html" class="back">← Inicio</a>
-  <div class="spacer"></div>
-  <div class="toggle">
-    <button class="on" id="bAct" onclick="setS('a')">Actual</button>
-    <button id="bOpt" onclick="setS('o')">Optimizado</button>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-logo">HOYO19</div>
+  <div class="nav-links">
+    <a href="#home">Inicio</a>
+    <a href="#servicios">Servicios</a>
+    <a href="report/index.html">Reporte</a>
+    <a href="#contacto">Contacto</a>
   </div>
-</div>
-<button class="mob-btn" onclick="document.getElementById('sb').classList.toggle('open')">☰</button>
-
-<!-- SIDEBAR -->
-<nav class="sidebar" id="sb">
-<div class="sidebar-inner" id="sidebar-nav"></div>
+  <div class="nav-spacer"></div>
+  <button class="nav-btn" onclick="location.href='#contacto'">Acceder</button>
+  <button class="mobile-nav-btn" onclick="document.querySelector('.nav-links').style.display=document.querySelector('.nav-links').style.display==='flex'?'none':'flex'" aria-label="Menu">☰</button>
 </nav>
 
-<!-- MAIN -->
-<div class="main">
-<div class="content">
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <canvas class="hero-particles" id="particles"></canvas>
+  <div class="hero-content">
+    <div class="hero-tag">Consultoría Minera Profesional — 2026</div>
+    <h1><span class="gold">HOYO19</span> Mining<br>Reporte 2026</h1>
+    <p class="hero-sub">Plataforma profesional de consultoría minera, inteligencia de mercado y modelos de exportación de minerales.</p>
+    <div class="hero-btns">
+      <a href="#servicios" class="btn btn-gold">Ver Servicios →</a>
+      <a href="report/index.html" class="btn btn-outline">Explorar Reporte</a>
+      <a href="#contacto" class="btn btn-ghost">Contactar</a>
+    </div>
+  </div>
+</section>
 
-<!-- KPIs -->
-<div class="kpis">
-  <div class="kpi"><div class="kpi-label">Costo logístico</div><div class="kpi-val d" id="k1">$587/t</div><div class="kpi-sub">USD por tonelada</div></div>
-  <div class="kpi"><div class="kpi-label">Tiempo total</div><div class="kpi-val d" id="k2">75 días</div><div class="kpi-sub">Extracción → destino</div></div>
-  <div class="kpi"><div class="kpi-label">Proveedores</div><div class="kpi-val w" id="k3">1</div><div class="kpi-sub">Agentes de carga</div></div>
-  <div class="kpi"><div class="kpi-label">Visibilidad</div><div class="kpi-val w" id="k4">35%</div><div class="kpi-sub">Control operativo</div></div>
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span>
+    <span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span><span>⛏️</span><span>⛳</span>
+  </div>
 </div>
 
-<div class="pills">
-  <div class="pill r">◉ Ruta — <span id="p1">Potosí → Cochabamba → Arica</span></div>
-  <div class="pill b">◉ Cuello de botella — <span id="p2">Acopio en Chilcobija</span></div>
-  <div class="pill s">◉ Escenario — <span id="p3">Operación actual</span></div>
-</div>
+<!-- SERVICES -->
+<section class="services" id="servicios">
+  <div class="section-label">Servicios</div>
+  <h2>Servicios Estratégicos</h2>
+  <p class="sub">Soluciones diseñadas para maximizar valor en el sector minero</p>
 
-<!-- ══ ALL SECTIONS ══ -->
-<div id="sections-container"></div>
+  <div class="cards">
+    <!-- CARD 1 — CLICKABLE, links to report -->
+    <div class="card clickable" onclick="location.href='report/index.html'">
+      <a href="report/index.html" class="card-link" aria-label="Ver reporte de optimización"></a>
+      <div class="card-icon">🚛</div>
+      <h3>Optimizacion De Transporte En La Exportacion De Minerales</h3>
+      <p>Este estudio analiza y optimiza la logística de exportación minera para reducir costos, mejorar tiempos y aumentar la eficiencia.</p>
+      <span class="card-tag">Ver reporte →</span>
+    </div>
 
-</div>
-</div>
+    <!-- CARD 2 -->
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Actores Clave en la Comercialización de Minerales de Zinc, Plata y Antimonio</h3>
+      <p>Datos, análisis y tendencias para tomar decisiones informadas.</p>
+      <span class="card-tag">Próximamente</span>
+    </div>
 
+    <!-- CARD 3 -->
+    <div class="card">
+      <div class="card-icon">🌍</div>
+      <h3>Diseño de Modelos de Exportacion de Minerales de Zinc, Plata y Antimonio</h3>
+      <p>Modelos eficientes para llevar recursos al mercado global.</p>
+      <span class="card-tag">Próximamente</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-grid">
+    <div><div class="stat-val">$587</div><div class="stat-label">USD/t costo logístico actual</div></div>
+    <div><div class="stat-val">75</div><div class="stat-label">Días extracción → destino</div></div>
+    <div><div class="stat-val">1,187</div><div class="stat-label">km recorrido terrestre</div></div>
+    <div><div class="stat-val">~20%</div><div class="stat-label">Reducción de costos estimada</div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="section-label">Acerca de</div>
+  <h2>HOYO 19 S.R.L.</h2>
+  <p>Exportadora minera con sede en La Paz, Bolivia. Especializada en la comercialización de trióxido de antimonio con leyes comprendidas en 85%, orientada hacia clientes industriales en Estados Unidos.</p>
+  <p>HOYO19 CORE es nuestro servicio de optimización logística enfocado en reducir costos, mejorar tiempos y aumentar la competitividad de las operaciones de exportación minera.</p>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contacto">
+  <div class="section-label">Contacto</div>
+  <h2>¿Interesado en trabajar con nosotros?</h2>
+  <p>Si buscas optimizar tu cadena logística minera o necesitas consultoría especializada, contáctanos.</p>
+  <a href="mailto:contacto@hoyo19.com" class="contact-link">contacto@hoyo19.com</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">HOYO19</div>
+  <p>Exportadora Minera | La Paz, Bolivia | Abril 2026</p>
+  <p style="margin-top:6px">© 2026 HOYO 19 S.R.L.</p>
+</footer>
+
+<!-- PARTICLE BACKGROUND -->
 <script>
-// ═══════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════
-const NAV = [
-  {id:'1',t:'Introducción',items:[
-    {id:'1-1',t:'1.1 Contexto minero-exportador'},{id:'1-2',t:'1.2 Importancia del transporte'},{id:'1-3',t:'1.3 Problemática actual'},
-    {id:'1-4',t:'1.4 Objetivo general'},{id:'1-5',t:'1.5 Objetivos específicos'},{id:'1-6',t:'1.6 Alcance y limitaciones'},{id:'1-7',t:'1.7 Metodología'}]},
-  {id:'2',t:'Marco Conceptual',items:[
-    {id:'2-1',t:'2.1 Cadena de suministro'},{id:'2-2',t:'2.2 Conceptos clave'},{id:'2-3',t:'2.3 Tipos de transporte'},{id:'2-4',t:'2.4 Incoterms'},{id:'2-5',t:'2.5 Costos logísticos'}]},
-  {id:'3',t:'Diagnóstico Actual',items:[
-    {id:'3-1',t:'3.1 Flujo logístico'},{id:'3-2',t:'3.2 Rutas de transporte'},{id:'3-3',t:'3.3 Infraestructura'},{id:'3-4',t:'3.4 Actores involucrados'},
-    {id:'3-5',t:'3.5 Tiempos de transporte'},{id:'3-6',t:'3.6 Costos actuales'},{id:'3-7',t:'3.7 Cuellos de botella'},{id:'3-8',t:'3.8 Ineficiencias'}]},
-  {id:'4',t:'Análisis de Transporte',items:[
-    {id:'4-1',t:'4.1 Mina → Planta'},{id:'4-2',t:'4.2 Planta → Exportación'},{id:'4-3',t:'4.3 Logística en frontera'},
-    {id:'4-4',t:'4.4 Transporte internacional'},{id:'4-5',t:'4.5 Comparación entre rutas'},{id:'4-6',t:'4.6 Evaluación de riesgos'}]},
-  {id:'5',t:'Costos y Análisis Económico',items:[
-    {id:'5-1',t:'5.1 Estructura de costos'},{id:'5-2',t:'5.2 Costos por transporte'},{id:'5-3',t:'5.3 Costos por ruta'},
-    {id:'5-4',t:'5.4 Impacto en precio final'},{id:'5-5',t:'5.5 Análisis de eficiencia'},{id:'5-6',t:'5.6 Sensibilidad'}]},
-  {id:'6',t:'Problemática',items:[
-    {id:'6-1',t:'6.1 Infraestructura'},{id:'6-2',t:'6.2 Accesibilidad'},{id:'6-3',t:'6.3 Aduanas'},
-    {id:'6-4',t:'6.4 Costos'},{id:'6-5',t:'6.5 Intermediarios'},{id:'6-6',t:'6.6 Riesgos'},{id:'6-7',t:'6.7 Falta de optimización'}]},
-  {id:'7',t:'HOYO19 CORE',items:[
-    {id:'7-1',t:'7.1 Objetivo del servicio'},{id:'7-2',t:'7.2 Alcance'},{id:'7-3',t:'7.3 Cliente objetivo'},
-    {id:'7-4',t:'7.4 Metodología'},{id:'7-5',t:'7.5 Etapas'},{id:'7-6',t:'7.6 Herramientas'}]},
-  {id:'8',t:'Estrategias de Optimización',items:[
-    {id:'8-1',t:'8.1 Optimización de rutas'},{id:'8-2',t:'8.2 Reducción de costos'},{id:'8-3',t:'8.3 Mejora de tiempos'},
-    {id:'8-4',t:'8.4 Integración logística'},{id:'8-5',t:'8.5 Tecnología'},{id:'8-6',t:'8.6 Consolidación'},{id:'8-7',t:'8.7 Negociación'}]},
-  {id:'9',t:'Propuesta de Mejora',items:[
-    {id:'9-1',t:'9.1 Rediseño logístico'},{id:'9-2',t:'9.2 Selección de rutas'},{id:'9-3',t:'9.3 Coordinación'},
-    {id:'9-4',t:'9.4 Reducción de costos'},{id:'9-5',t:'9.5 KPIs'},{id:'9-6',t:'9.6 Plan de implementación'}]},
-  {id:'10',t:'Evaluación de Impacto',items:[
-    {id:'10-1',t:'10.1 Beneficios económicos'},{id:'10-2',t:'10.2 Reducción de costos'},{id:'10-3',t:'10.3 Mejora de tiempos'},
-    {id:'10-4',t:'10.4 Eficiencia'},{id:'10-5',t:'10.5 Competitividad'}]},
-  {id:'11',t:'Análisis de Riesgos',items:[
-    {id:'11-1',t:'11.1 Operativos'},{id:'11-2',t:'11.2 Económicos'},{id:'11-3',t:'11.3 Logísticos'},{id:'11-4',t:'11.4 Mitigación'}]},
-  {id:'12',t:'Caso Práctico',items:[
-    {id:'12-1',t:'12.1 Empresa'},{id:'12-2',t:'12.2 Situación inicial'},{id:'12-3',t:'12.3 Diagnóstico'},
-    {id:'12-4',t:'12.4 Propuesta'},{id:'12-5',t:'12.5 Resultados'},{id:'12-6',t:'12.6 Antes/Después'}]},
-  {id:'13',t:'Conclusiones',items:[
-    {id:'13-1',t:'13.1 Hallazgos'},{id:'13-2',t:'13.2 Importancia del transporte'},{id:'13-3',t:'13.3 Evaluación del servicio'}]},
-  {id:'14',t:'Recomendaciones',items:[{id:'14-1',t:'14.1–14.6 Todas'}]},
-  {id:'15',t:'Bibliografía',items:[{id:'15-1',t:'15.1 Fuentes'}]},
-];
-
-// Build sidebar
-const sbHTML = NAV.map((s,i)=>`<div class="ns">
-  <div class="ns-title${i===0?' open':''}" onclick="togN(this)"><span class="n">${String(i+1).padStart(2,'0')}</span>${s.t}<span class="arr">▸</span></div>
-  <div class="ni-list${i===0?' open':''}">${s.items.map(it=>`<a class="ni" href="#s${it.id}">${it.t}</a>`).join('')}</div>
-</div>`).join('');
-document.getElementById('sidebar-nav').innerHTML=sbHTML;
-
-function togN(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('open')}
-document.querySelectorAll('.ni').forEach(n=>n.addEventListener('click',()=>{if(innerWidth<=900)document.getElementById('sb').classList.remove('open')}));
-
-// ═══════════════════════════════════════════
-// SECTION CONTENT (condensed for file size — all 16 sections)
-// ═══════════════════════════════════════════
-const SC = {
-'1-1':{h:'Contexto del sector minero-exportador',p:'El sector minero-exportador es pilar fundamental en Bolivia. Minerales como el antimonio son estratégicos por sus aplicaciones en retardantes de llama, baterías y aleaciones. China lidera la producción mundial, generando competencia para otros productores. Bolivia tiene reservas importantes pero la eficiencia operativa y la integración con mercados internacionales son clave.'},
-'1-2':{h:'Importancia del transporte en la cadena de valor minera',p:'El transporte conecta la mina con el cliente final. En minería, mover el producto eficientemente cambia por completo los márgenes del negocio porque afecta costo, tiempo, riesgo y cumplimiento. La optimización de rutas y coordinación puede generar reducciones significativas.'},
-'1-3':{h:'Problemática actual en la logística de exportación',p:'La logística opera bajo estructuras fragmentadas con múltiples actores sin integración óptima. Hay dependencia de rutas específicas, vulnerabilidad a eventos externos y ausencia de planificación optimizada. Todo genera tiempos largos, sobrecostos y menor competitividad.'},
-'1-4':{h:'Objetivo general',p:'Analizar la cadena logística de exportación de minerales con énfasis en transporte, para identificar ineficiencias, evaluar su impacto y proponer estrategias de optimización.'},
-'1-5':{h:'Objetivos específicos',p:'Entender el contexto sectorial, evaluar el rol del transporte, identificar limitaciones, analizar el flujo actual y proponer estrategias concretas de optimización.'},
-'1-6':{h:'Alcance y limitaciones',p:'Se enfoca en la exportación de antimonio de HOYO19 S.R.L. desde extracción hasta exportación. Limitaciones: variabilidad de volumen, dependencia de proveedores, información parcial.'},
-'1-7':{h:'Metodología',p:'Combina información técnica del sector con datos operativos del caso HOYO19. Análisis estructurado que identifica cuellos de botella, evalúa impactos y diseña propuestas.'},
-'2-1':{h:'Cadena de suministro en la minería',p:'Va desde la extracción hasta la entrega al cliente: acopio → concentración → transporte interno → exportación → distribución. Es un sistema interdependiente donde cualquier ineficiencia afecta el desempeño global.',chart:'flow'},
-'2-2':{h:'Conceptos clave de logística y transporte',p:'Logística = planificar y controlar el flujo del producto. Costo logístico incluye transporte, almacenamiento, seguros, aduanas y coordinación. En minería estos costos pueden ser proporción significativa del valor del producto.'},
-'2-3':{h:'Tipos de transporte',p:'Terrestre (camiones): el más usado en etapas iniciales. Marítimo: principal medio para exportación internacional. Multimodal: combinación de medios donde la eficiencia depende de la coordinación entre tramos.'},
-'2-4':{h:'Incoterms aplicados a minerales',p:'FOB = responsabilidad del vendedor hasta carga en buque. CIF = incluye transporte y seguro hasta puerto de destino. La selección impacta directamente la estructura de costos y gestión de riesgos.'},
-'2-5':{h:'Costos logísticos y su impacto en la rentabilidad',p:'El transporte suele ser la mayor proporción de los costos logísticos totales, especialmente con distancias largas e infraestructura limitada. La optimización genera mejoras directas en rentabilidad.'},
-'3-1':{h:'Flujo logístico actual',p:'Sistema secuencial: extracción (~2%) → acopio Chilcobija → concentración Sayari (~85%) → transporte terrestre → Puerto Arica → marítimo → Houston. Tiempo total: ~75 días. Distancia terrestre: 1,171–1,200 km.',chart:'flow'},
-'3-2':{h:'Rutas de transporte',p:'Ruta principal: Potosí → Cochabamba (~407 km) → Arica (~780 km vía Oruro y Tambo Quemado). Existen alternativas no plenamente desarrolladas.',chart:'distances'},
-'3-3':{h:'Infraestructura disponible',p:'Carreteras con estado variable por lluvias, mantenimiento y conflictos sociales. Tramos secundarios con limitaciones. Puerto de Arica como punto de salida principal.'},
-'3-4':{h:'Actores involucrados',p:'Proveedores de mineral, centros de acopio (Chilcobija, Sayari), transportistas (EZ Logistics), agentes de carga, agentes aduaneros, intermediarios y clientes finales en EE.UU.'},
-'3-5':{h:'Tiempos de transporte',p:'Mina → Chilcobija: 20–25 días. Chilcobija → Sayari: 15 días. Transporte → exportación: ~36 días. Retrasos recurrentes en acopio por dependencia de proveedores.',chart:'times'},
-'3-6':{h:'Costos actuales',p:'Mina → Planta: ~32 USD/t. Planta → Puerto: ~2,643 USD/contenedor. Marítimo: ~6,274 USD/envío. Seguros: 0.07 del valor. Regalías: ~5%.',chart:'costs'},
-'3-7':{h:'Cuellos de botella',p:'Principal cuello de botella: acopio en Chilcobija. Dependencia de proveedores y disponibilidad de mineral genera retrasos en consolidación. Centralización del procesamiento reduce flexibilidad.'},
-'3-8':{h:'Ineficiencias del sistema',p:'Dependencia de pocos proveedores, rutas poco diversificadas, pocos agentes de carga, costos altos, sin herramientas tecnológicas, procesos de acopio ineficientes.'},
-'4-1':{h:'Transporte mina → planta',p:'Mineral a ~55% pureza transportado en volquetas, ~400 t en múltiples viajes. Costo: ~32 USD/t. Tiempo: 20–25 días. Punto crítico que define la velocidad del sistema.'},
-'4-2':{h:'Transporte planta → exportación',p:'Contenedores 20\' (~16 t/envío), Cochabamba → Arica (760–800 km). Costo: ~2,643 USD/contenedor (~165 USD/t). Expuesto a condiciones viales, congestión y eventos sociales.'},
-'4-3':{h:'Logística en frontera',p:'Cruce por Tambo Quemado. Exportación minera exenta de aranceles e IVA, pero depende de eficiencia aduanera y coordinación documental.'},
-'4-4':{h:'Transporte internacional',p:'Arica → Houston vía marítimo. Costo: ~6,274 USD/envío (~390 USD/t) — el componente más caro. Sujeto a tarifas internacionales, disponibilidad de buques y variabilidad.'},
-'4-5':{h:'Comparación entre rutas',p:'Operación concentrada en una ruta sin alternativas desarrolladas. Operaciones maduras tienen múltiples corredores, acceso a diferentes puertos y opciones multimodales.'},
-'4-6':{h:'Evaluación de riesgos',p:'Riesgos operativos (retrasos, descoordinación), logísticos (ruta única, baja diversificación), externos (conflictos, clima) y económicos (costos altos, volatilidad de tarifas).',chart:'risks'},
-'5-1':{h:'Estructura de costos',p:'Los costos se acumulan: transporte interno + terrestre al puerto + marítimo + seguros + regalías + servicios aduaneros. Efecto acumulativo sobre costo por tonelada.'},
-'5-2':{h:'Costos por tipo de transporte',p:'Mina → Planta: ~32 USD/t. Terrestre: ~165 USD/t. Marítimo: ~390 USD/t. El marítimo es el componente más elevado, dependiente de tarifas globales.',chart:'costs_bar'},
-'5-3':{h:'Costos por ruta',p:'Ruta Potosí → Cochabamba → Arica → EE.UU.: Mina→Planta $32 + Terrestre ~$165 + Marítimo ~$390 = Total estimado ~$587/t. Sin incluir regalías ni seguros.',chart:'costs_pie'},
-'5-4':{h:'Impacto en precio final',p:'Cuando el precio del antimonio fluctúa y los costos logísticos se mantienen altos, la rentabilidad depende de controlar y optimizar la logística.'},
-'5-5':{h:'Análisis de eficiencia',p:'Ineficiencias principales: material con baja concentración, tiempos prolongados en acopio, rutas largas, costos elevados.'},
-'5-6':{h:'Sensibilidad',p:'Alta sensibilidad a: variaciones en costos de transporte, retrasos, falta de volumen constante y dependencia de pocos actores.',chart:'sensitivity'},
-'6-1':{h:'Infraestructura',p:'Red vial con limitaciones por topografía, mantenimiento insuficiente y deterioro en lluvias. Tramos secundarios dificultan movilización eficiente.'},
-'6-2':{h:'Accesibilidad',p:'Acceso a rutas principales depende de rutas secundarias no siempre confiables. Concentración del flujo reduce flexibilidad.'},
-'6-3':{h:'Aduanas',p:'Exención de aranceles e IVA facilita el comercio, pero tiempos administrativos y controles pueden generar demoras acumulativas.'},
-'6-4':{h:'Costos',p:'Costo logístico alto y difícil de controlar: dependencia de proveedores, baja capacidad de negociación, falta de optimización.'},
-'6-5':{h:'Intermediarios',p:'Múltiples actores generan dependencia, incremento en costos por comisiones, pérdida de eficiencia y menor visibilidad.'},
-'6-6':{h:'Riesgos',p:'Exposición a riesgos operativos, logísticos, externos y económicos. Combinación genera alta incertidumbre operativa.'},
-'6-7':{h:'Falta de optimización',p:'El sistema funciona pero no está diseñado como un todo integrado. Falta planificación de rutas, gestión de tiempos, diversificación, integración y tecnología.'},
-'7-1':{h:'Objetivo del servicio',p:'HOYO19 CORE optimiza la cadena logística: reducir costos, mejorar tiempos, aumentar competitividad. El mayor impacto económico proviene de la logística, no del proceso extractivo.'},
-'7-2':{h:'Alcance',p:'Cubre desde la mina hasta destino internacional. Upstream (extracción/volumen), intermedia (rutas/acopio/coordinación) y downstream (transporte internacional/planificación).'},
-'7-3':{h:'Cliente objetivo',p:'Empresas mineras PyMEs, exportadores de antimonio/zinc/plata, intermediarios y operadores logísticos. Enfocado en empresas con márgenes ajustados y logística sin optimizar.'},
-'7-4':{h:'Metodología',p:'Diagnóstico → Modelación logística → Identificación de oportunidades → Diseño de solución → Implementación → Monitoreo y mejora continua.'},
-'7-5':{h:'Etapas del servicio',p:'6 etapas: análisis de situación → evaluación técnica → diseño de propuesta → validación → implementación → seguimiento.'},
-'7-6':{h:'Herramientas',p:'Modelos de costos, simulación de rutas, análisis de sensibilidad, seguimiento de carga, dashboards, plataformas de análisis de datos.'},
-'8-1':{h:'Optimización de rutas',p:'Tramo terrestre cuesta ~165 USD/t. Evaluar alternativas por distancia/estado vial/tiempos, reducir tramos redundantes, evitar zonas con variabilidad operativa.'},
-'8-2':{h:'Reducción de costos',p:'Costo >580 USD/t. Optimizar estructura de transporte, mejorar contratación, eliminar intermediarios sin valor, maximizar uso de contenedores.'},
-'8-3':{h:'Mejora de tiempos',p:'Menos tiempo = menos capital inmovilizado. Sincronizar etapas, reducir almacenamiento intermedio, planificar anticipadamente, flujos continuos.'},
-'8-4':{h:'Integración logística',p:'Centralizar información, mejorar comunicación entre actores, coordinar decisiones de transporte y almacenamiento, alinear objetivos.'},
-'8-5':{h:'Tecnología',p:'Tracking en tiempo real, análisis continuo de costos/tiempos, simulación de escenarios, dashboards operativos. De reactivo a data-driven.'},
-'8-6':{h:'Consolidación',p:'Agrupar volúmenes de carga para maximizar recursos. Coordinación entre productores, planificación conjunta, uso eficiente de contenedores completos.'},
-'8-7':{h:'Negociación',p:'Análisis de tarifas de mercado, comparación entre proveedores, relaciones a largo plazo. Reduce costos y mejora condiciones operativas.'},
-'9-1':{h:'Rediseño logístico',p:'Transformación a modelo integrado: simplificación de cadena, reducción de puntos intermedios, mejor secuencia, coordinación entre etapas. De reactivo a planificado.'},
-'9-2':{h:'Selección de rutas',p:'No eliminar la ruta actual sino mejorarla y complementarla con alternativas. Evaluar puertos del Pacífico, priorizar trayectos con menor variabilidad.'},
-'9-3':{h:'Coordinación',p:'Coordinación centralizada: sincronizar extracción/acopio/transporte, reducir tiempos de espera, mejorar comunicación, flujo continuo.'},
-'9-4':{h:'Reducción de costos',p:'Optimización terrestre, consolidación, mejor negociación, menos intermediarios. Enfoque estructural: eliminar ineficiencias del sistema.'},
-'9-5':{h:'KPIs',p:'Costo/t, tiempo total, permanencia en acopio, utilización de capacidad, cumplimiento de entrega, variabilidad en costos y tiempos.'},
-'9-6':{h:'Plan de implementación',p:'Fase 1: Preparación (datos, rutas, KPIs). Fase 2: Implementación (rutas prioritarias, coordinación, consolidación). Fase 3: Optimización continua (monitoreo, tecnología, mejora).',chart:'comparison'},
-'10-1':{h:'Beneficios económicos',p:'Efecto multiplicador en rentabilidad sin inversión en proceso productivo. Optimización de rutas, eliminación de ineficiencias, mejor utilización de activos.'},
-'10-2':{h:'Reducción de costos',p:'Transporte terrestre y marítimo = >95% del costo logístico. Mejora de 10–15% en eficiencia terrestre genera reducciones relevantes. Consolidación y negociación por volumen en marítimo.'},
-'10-3':{h:'Mejora de tiempos',p:'Coordinación centralizada y planificación anticipada: reducir esperas, eliminar interrupciones, transporte continuo. Menos tiempo = mejor rotación del capital.'},
-'10-4':{h:'Eficiencia',p:'No optimizar una etapa sino alinear todo el sistema: control por etapa, reducción de errores, mejor asignación de recursos, mayor previsibilidad.'},
-'10-5':{h:'Competitividad',p:'Reducir costo final, mejorar márgenes, condiciones más competitivas internacionalmente. En Bolivia, sin acceso al mar, la optimización logística es crítica.'},
-'11-1':{h:'Riesgos operativos',p:'Falta de coordinación, variabilidad en disponibilidad de mineral, procesos manuales poco estandarizados. Interrupciones por desalineación entre actores.'},
-'11-2':{h:'Riesgos económicos',p:'Con >580 USD/t en costos logísticos, variaciones en tarifas impactan directamente márgenes. Marítimo (~390 USD/t) sujeto a variaciones globales.'},
-'11-3':{h:'Riesgos logísticos',p:'Dependencia de una ruta principal, limitadas alternativas, congestión en tramos críticos. Cualquier interrupción afecta toda la operación.'},
-'11-4':{h:'Mitigación',p:'Integración del sistema, planificación anticipada, diversificación de rutas y proveedores, implementación de KPIs, uso de tecnología.'},
-'12-1':{h:'Empresa',p:'Exportadora boliviana de trióxido de antimonio (~85%). Envíos de ~15,500 kg bimensuales. Ruta: Bolivia → Arica → Houston. Escala pequeña-intermedia con cadena compleja.'},
-'12-2':{h:'Situación inicial',p:'Operación funcional pero fragmentada: pocos proveedores, acopio concentrado, pocos operadores, sin software logístico, visibilidad limitada al tracking naviero. Tiempo total: 75–80 días.'},
-'12-3':{h:'Diagnóstico',p:'La restricción principal es la estructura logística, no la comercialización. Cuello de botella en acopio Chilcobija. Costos: ~32 USD/t + ~2,643 USD/contenedor + ~6,274 USD marítimo. Alta dependencia de un solo agente.'},
-'12-4':{h:'Propuesta',p:'Diversificar abastecimiento, reducir dependencia de un solo punto, optimizar red de transporte, incorporar herramientas de gestión, coordinación centralizada.'},
-'12-5':{h:'Resultados esperados',p:'Mayor continuidad operativa, reducción de tiempos improductivos, mayor capacidad de negociación, mejor visibilidad del desempeño, mayor escalabilidad.'},
-'12-6':{h:'Antes/Después',p:'De dependencia y baja flexibilidad a red diversificada, mayor control y operación escalable.',chart:'beforeafter'},
-'13-1':{h:'Hallazgos',p:'La logística es el principal factor que condiciona eficiencia, rentabilidad y competitividad. Costo >580 USD/t. Cuellos de botella en acopio y coordinación. Sin sistemas basados en datos.'},
-'13-2':{h:'Importancia del transporte',p:'El transporte es el elemento más determinante: costo/t, tiempos, cumplimiento, competitividad. En Bolivia sin acceso al mar, la optimización es condición necesaria.'},
-'13-3':{h:'Evaluación del servicio',p:'HOYO19 CORE transforma un sistema fragmentado en uno integrado, convierte logística en proceso medible, reduce dependencia reactiva. Escalable a otras empresas.'},
-'14-1':{h:'Recomendaciones completas',p:'25 recomendaciones en 6 categorías: estratégicas, operativas, tecnológicas, financieras, logísticas avanzadas y mejora del proyecto.',chart:'recs'},
-'15-1':{h:'Fuentes',p:'Rivas (2010) Antimonio en Bolivia. Ministerio de Minería Bolivia. CEPAL. UNCTAD. Banco Mundial. Ballou (2004) Logistics. Chopra & Meindl (2016) Supply Chain Management. Datos operativos HOYO19.'},
-};
-
-// ═══════════════════════════════════════════
-// BUILD SECTIONS
-// ═══════════════════════════════════════════
-const container = document.getElementById('sections-container');
-let html = '';
-let lastSection = '';
-
-for(const [key, val] of Object.entries(SC)){
-  const sNum = key.split('-')[0];
-  const secName = NAV.find(n=>n.id===sNum)?.t||'';
-  
-  // New section header
-  if(sNum !== lastSection){
-    html += `<div class="sec" id="s${key}"><div class="sec-badge">Sección ${sNum}</div><h2>${secName.toUpperCase()}</h2>`;
-    lastSection = sNum;
-  } else {
-    html += `<div class="sec" id="s${key}">`;
-  }
-  
-  html += `<div class="sub"><h3>${val.h}</h3><p>${val.p}</p></div>`;
-  
-  // Charts
-  if(val.chart==='flow') html += `<div class="flow"><div class="flow-n">Extracción<br><small style="color:var(--text3)">~2%</small></div><div class="flow-a">→</div><div class="flow-n hl">Acopio<br><small>Chilcobija</small></div><div class="flow-a">→</div><div class="flow-n">Concentración<br><small>Sayari ~85%</small></div><div class="flow-a">→</div><div class="flow-n">Terrestre<br><small>~1,187 km</small></div><div class="flow-a">→</div><div class="flow-n">Arica</div><div class="flow-a">→</div><div class="flow-n">Houston</div></div>`;
-  if(val.chart==='distances') html += `<div class="chart-box"><div class="chart-title">Distancias por tramo (km)</div><canvas id="chDist"></canvas></div>`;
-  if(val.chart==='times') html += `<div class="chart-box"><div class="chart-title">Tiempos por etapa (días)</div><canvas id="chTime"></canvas></div>`;
-  if(val.chart==='costs'||val.chart==='costs_bar') html += `<div class="chart-box"><div class="chart-title">Costos por tipo de transporte (USD/t)</div><canvas id="chCost"></canvas></div>`;
-  if(val.chart==='costs_pie') html += `<div class="chart-box"><div class="chart-title">Distribución de costos logísticos</div><canvas id="chPie"></canvas></div>`;
-  if(val.chart==='risks') html += `<div class="rgrid"><div class="rcard"><div class="rt o">Operativos</div><div class="rv" id="rO">Alto</div><div class="rd">Retrasos, descoordinación, dependencia</div></div><div class="rcard"><div class="rt e">Económicos</div><div class="rv" id="rE">Alto</div><div class="rd">Costos altos, tarifas volátiles</div></div><div class="rcard"><div class="rt l">Logísticos</div><div class="rv" id="rL">Alto</div><div class="rd">Ruta única, sin alternativas</div></div><div class="rcard"><div class="rt x">Externos</div><div class="rv" id="rX">Medio-Alto</div><div class="rd">Clima, conflictos, infraestructura</div></div></div>`;
-  if(val.chart==='sensitivity') html += `<div class="chart-box"><div class="chart-title">Sensibilidad del costo logístico</div><canvas id="chSens"></canvas></div>`;
-  if(val.chart==='comparison') html += `<div class="chart-box"><div class="chart-title">Actual vs. Optimizado</div><canvas id="chComp"></canvas></div>`;
-  if(val.chart==='beforeafter') html += `<div class="chart-box"><div class="chart-title">Comparación antes/después</div><table class="ctable"><tr><th>Dimensión</th><th style="color:var(--red)">Antes</th><th style="color:var(--green)">Después</th></tr><tr><td>Proveedores</td><td>Pocos</td><td>Red diversificada</td></tr><tr><td>Acopio</td><td>Nodo único</td><td>Multi-punto</td></tr><tr><td>Agentes de carga</td><td>1</td><td>3+</td></tr><tr><td>Costos logísticos</td><td class="vb">~$587/t</td><td class="vg">~$470/t</td></tr><tr><td>Tiempo total</td><td class="vb">75 días</td><td class="vg">55–60 días</td></tr><tr><td>Visibilidad</td><td class="vb">35%</td><td class="vg">80%+</td></tr><tr><td>Herramientas</td><td>Ninguna propia</td><td>Dashboard + KPIs</td></tr></table></div>`;
-  if(val.chart==='recs') html += buildRecs();
-  
-  html += '</div>';
-}
-
-// Footer
-html += `<div class="foot"><div style="font-weight:800;color:var(--gold);letter-spacing:2px;margin-bottom:6px">HOYO19</div><p>Exportadora Minera | La Paz, Bolivia | Abril 2026</p></div>`;
-
-container.innerHTML = html;
-
-function buildRecs(){
-  const recs = [
-    {c:'Estratégicas',items:[{n:1,t:'Centralizar gestión logística',d:'Control tower en tiempo real'},{n:2,t:'Planificación por demanda',d:'Forecast, no esperar carga'},{n:3,t:'Relaciones estratégicas',d:'Acuerdos a mediano plazo'},{n:4,t:'Logística como ventaja competitiva',d:'Diferenciación en el sector'}]},
-    {c:'Operativas',items:[{n:5,t:'Diversificar acopio',d:'2–3 centros alternativos'},{n:6,t:'Diversificar proveedores',d:'Ampliar red de abastecimiento'},{n:7,t:'Consolidación sistemática',d:'Maximizar contenedores'},{n:8,t:'Flujo continuo',d:'Sin pausas entre etapas'},{n:9,t:'Reducir intermediarios',d:'Eliminar costos sin valor'}]},
-    {c:'Tecnológicas',items:[{n:10,t:'Tracking propio',d:'GPS y plataformas logísticas'},{n:11,t:'Dashboard logístico',d:'Costo/t, tiempo/tramo en tiempo real'},{n:12,t:'Simulación de rutas',d:'Comparar antes de ejecutar'},{n:13,t:'Base de datos histórica',d:'Mejora continua real'}]},
-    {c:'Financieras',items:[{n:14,t:'Negociar por volumen',d:'Mejores tarifas consolidando'},{n:15,t:'Reducir capital inmovilizado',d:'Menos tiempo = más liquidez'},{n:16,t:'Estandarizar costos/t',d:'Benchmark de costo objetivo'}]},
-    {c:'Logísticas avanzadas',items:[{n:17,t:'Rutas alternativas',d:'Perú, otros puertos'},{n:18,t:'Hub logístico',d:'Centros estratégicos'},{n:19,t:'Co-loading',d:'Compartir contenedores'},{n:20,t:'Pre-negociar slots',d:'Espacio asegurado en barcos'}]},
-    {c:'Mejora HOYO19',items:[{n:21,t:'CORE como producto',d:'Qué incluye, cuánto cuesta'},{n:22,t:'Data & analytics',d:'Medir y mostrar resultados'},{n:23,t:'Case studies',d:'Documentar antes/después'},{n:24,t:'Posicionar como experto',d:'Nicho en logística minera'},{n:25,t:'Escalar a otros minerales',d:'Zinc, plata, etc.'}]}
-  ];
-  let h='';
-  recs.forEach(cat=>{
-    h+=`<h4 style="color:var(--gold);margin:20px 0 12px;font-size:.86rem">${cat.c}</h4><div class="recgrid">`;
-    cat.items.forEach(r=>{h+=`<div class="rec"><div class="rn">#${r.n}</div><div class="rtt">${r.t}</div><div class="rdd">${r.d}</div></div>`});
-    h+='</div>';
-  });
-  return h;
-}
-
-// ═══════════════════════════════════════════
-// CHARTS (Chart.js)
-// ═══════════════════════════════════════════
-Chart.defaults.color='#8b93a7';
-Chart.defaults.borderColor='rgba(255,255,255,.06)';
-Chart.defaults.font.family='Inter';
-Chart.defaults.font.size=12;
-
-const G='#e8b830',B='#60a5fa',R='#f87171',GR='#4ade80',O='#fb923c';
-let charts={};
-
-function mkChart(id,cfg){
-  const el=document.getElementById(id);
-  if(!el)return null;
-  const c=new Chart(el,cfg);
-  charts[id]=c;
-  return c;
-}
-
-// Distance chart
-mkChart('chDist',{type:'bar',data:{labels:['Potosí → Cbba','Cbba → Arica','Total'],datasets:[{data:[407,780,1187],backgroundColor:[G,B,O],borderRadius:6,barThickness:28}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{display:false}}}}});
-
-// Time chart
-mkChart('chTime',{type:'bar',data:{labels:['Mina → Acopio','Acopio → Planta','Planta → Houston'],datasets:[{label:'Actual',data:[22,15,36],backgroundColor:[R,O,B],borderRadius:6,barThickness:24},{label:'Optimizado',data:[15,10,32],backgroundColor:['rgba(248,113,113,.3)','rgba(251,146,60,.3)','rgba(96,165,250,.3)'],borderRadius:6,barThickness:24}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:16}}},scales:{x:{grid:{display:false},title:{display:true,text:'Días'}},y:{grid:{display:false}}}}});
-
-// Cost chart
-mkChart('chCost',{type:'bar',data:{labels:['Mina → Planta','Terrestre','Marítimo'],datasets:[{label:'Actual',data:[32,165,390],backgroundColor:[G,B,R],borderRadius:6},{label:'Optimizado',data:[28,140,302],backgroundColor:['rgba(232,184,48,.3)','rgba(96,165,250,.3)','rgba(248,113,113,.3)'],borderRadius:6}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:16}}},scales:{y:{grid:{color:'rgba(255,255,255,.04)'},title:{display:true,text:'USD/t'}},x:{grid:{display:false}}}}});
-
-// Pie chart
-mkChart('chPie',{type:'doughnut',data:{labels:['Mina→Planta ($32)','Terrestre ($165)','Marítimo ($390)'],datasets:[{data:[32,165,390],backgroundColor:[G,B,R],borderWidth:0,hoverOffset:8}]},options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:16}}}}});
-
-// Sensitivity chart
-mkChart('chSens',{type:'radar',data:{labels:['Costos transporte','Retrasos','Volumen','Dependencia de actores','Tarifas marítimas'],datasets:[{label:'Actual',data:[9,8,7,9,8],borderColor:R,backgroundColor:'rgba(248,113,113,.1)',pointBackgroundColor:R},{label:'Optimizado',data:[5,4,4,4,5],borderColor:GR,backgroundColor:'rgba(74,222,128,.08)',pointBackgroundColor:GR}]},options:{responsive:true,scales:{r:{angleLines:{color:'rgba(255,255,255,.06)'},grid:{color:'rgba(255,255,255,.06)'},pointLabels:{font:{size:11}},ticks:{display:false},min:0,max:10}},plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:16}}}}});
-
-// Comparison chart
-mkChart('chComp',{type:'bar',data:{labels:['Costo (USD/t)','Tiempo (días)','Visibilidad (%)','Proveedores'],datasets:[{label:'Actual',data:[587,75,35,1],backgroundColor:R,borderRadius:6},{label:'Optimizado',data:[470,57,80,3],backgroundColor:GR,borderRadius:6}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:16}}},scales:{y:{grid:{color:'rgba(255,255,255,.04)'}},x:{grid:{display:false}}}}});
-
-// ═══════════════════════════════════════════
-// SCENARIO TOGGLE
-// ═══════════════════════════════════════════
-let sc='a';
-function setS(s){
-  sc=s;
-  document.getElementById('bAct').classList.toggle('on',s==='a');
-  document.getElementById('bOpt').classList.toggle('on',s==='o');
-  upd();
-}
-
-function upd(){
-  const o=sc==='o';
-  // KPIs
-  document.getElementById('k1').textContent=o?'$470/t':'$587/t';
-  document.getElementById('k1').className='kpi-val '+(o?'g':'d');
-  document.getElementById('k2').textContent=o?'57 días':'75 días';
-  document.getElementById('k2').className='kpi-val '+(o?'g':'d');
-  document.getElementById('k3').textContent=o?'3+':'1';
-  document.getElementById('k3').className='kpi-val '+(o?'g':'w');
-  document.getElementById('k4').textContent=o?'80%':'35%';
-  document.getElementById('k4').className='kpi-val '+(o?'g':'w');
-  // Pills
-  document.getElementById('p1').textContent=o?'Rutas diversificadas':'Potosí → Cochabamba → Arica';
-  document.getElementById('p2').textContent=o?'Mitigado (multi-punto)':'Acopio en Chilcobija';
-  document.getElementById('p3').textContent=o?'Escenario optimizado':'Operación actual';
-  // Risks
-  const rO=document.getElementById('rO'),rE=document.getElementById('rE'),rL=document.getElementById('rL'),rX=document.getElementById('rX');
-  if(rO){rO.textContent=o?'Medio':'Alto';rE.textContent=o?'Medio':'Alto';rL.textContent=o?'Medio-Bajo':'Alto';rX.textContent=o?'Medio':'Medio-Alto'}
-  // Update chart data
-  if(charts.chTime){
-    charts.chTime.data.datasets[0].backgroundColor=o?['rgba(248,113,113,.3)','rgba(251,146,60,.3)','rgba(96,165,250,.3)']:[R,O,B];
-    charts.chTime.data.datasets[1].backgroundColor=o?[R,O,B]:['rgba(248,113,113,.3)','rgba(251,146,60,.3)','rgba(96,165,250,.3)'];
-    charts.chTime.update();
-  }
-  if(charts.chCost){
-    charts.chCost.data.datasets[0].backgroundColor=o?['rgba(232,184,48,.3)','rgba(96,165,250,.3)','rgba(248,113,113,.3)']:[G,B,R];
-    charts.chCost.data.datasets[1].backgroundColor=o?[G,B,R]:['rgba(232,184,48,.3)','rgba(96,165,250,.3)','rgba(248,113,113,.3)'];
-    charts.chCost.update();
-  }
-  if(charts.chPie){
-    charts.chPie.data.datasets[0].data=o?[28,140,302]:[32,165,390];
-    charts.chPie.data.labels=o?['Mina→Planta ($28)','Terrestre ($140)','Marítimo ($302)']:['Mina→Planta ($32)','Terrestre ($165)','Marítimo ($390)'];
-    charts.chPie.update();
-  }
-}
-
-// Scroll spy
-const secs=document.querySelectorAll('.sec[id]');
-const nis=document.querySelectorAll('.ni');
-const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id;nis.forEach(n=>{n.classList.toggle('active',n.getAttribute('href')==='#'+id)})}})},{rootMargin:'-70px 0px -60% 0px',threshold:0});
-secs.forEach(s=>obs.observe(s));
+const c=document.getElementById('particles'),ctx=c.getContext('2d');
+let w,h,dots=[];
+function resize(){w=c.width=window.innerWidth;h=c.height=window.innerHeight}
+window.addEventListener('resize',resize);resize();
+for(let i=0;i<60;i++)dots.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5+.5,dx:(Math.random()-.5)*.3,dy:(Math.random()-.5)*.3,o:Math.random()*.3+.1});
+function draw(){ctx.clearRect(0,0,w,h);dots.forEach(d=>{d.x+=d.dx;d.y+=d.dy;if(d.x<0||d.x>w)d.dx*=-1;if(d.y<0||d.y>h)d.dy*=-1;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);ctx.fillStyle=`rgba(232,184,48,${d.o})`;ctx.fill()});requestAnimationFrame(draw)}
+draw();
 </script>
+
 </body>
 </html>
